@@ -1,0 +1,41 @@
+package com.sqdstudios.easyrelease.cli.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
+import java.util.Map;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Config {
+    private String modrinthProjectId;
+    private String githubRepo; // owner/repo
+    private String mainBranch;
+    private List<String> minecraftVersions;
+    private List<Loader> loaders;
+    private Map<String, String> dependencies; // slug -> dependency_type (required, optional, etc)
+    private String modrinthToken;
+    private String githubToken;
+
+    public String getModrinthProjectId() { return modrinthProjectId; }
+    public void setModrinthProjectId(String modrinthProjectId) { this.modrinthProjectId = modrinthProjectId; }
+
+    public String getGithubRepo() { return githubRepo; }
+    public void setGithubRepo(String githubRepo) { this.githubRepo = githubRepo; }
+
+    public String getMainBranch() { return mainBranch; }
+    public void setMainBranch(String mainBranch) { this.mainBranch = mainBranch; }
+
+    public List<String> getMinecraftVersions() { return minecraftVersions; }
+    public void setMinecraftVersions(List<String> minecraftVersions) { this.minecraftVersions = minecraftVersions; }
+
+    public List<Loader> getLoaders() { return loaders; }
+    public void setLoaders(List<Loader> loaders) { this.loaders = loaders; }
+
+    public Map<String, String> getDependencies() { return dependencies; }
+    public void setDependencies(Map<String, String> dependencies) { this.dependencies = dependencies; }
+
+    public String getModrinthToken() { return modrinthToken; }
+    public void setModrinthToken(String modrinthToken) { this.modrinthToken = modrinthToken; }
+
+    public String getGithubToken() { return githubToken; }
+    public void setGithubToken(String githubToken) { this.githubToken = githubToken; }
+}
