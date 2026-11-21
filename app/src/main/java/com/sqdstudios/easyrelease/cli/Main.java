@@ -46,11 +46,11 @@ public class Main {
         System.out.print(CYAN + "Version Subtitle: " + RESET);
         String subtitle = sc.nextLine();
 
-        System.out.println(CYAN + "Description (Changelog) - Enter an empty line or '.' to finish:" + NO_NL);
+        System.out.println(CYAN + "Changelog - (Write :wq to stop):" + NO_NL);
         StringBuilder descriptionBuilder = new StringBuilder();
         while (true) {
             String line = sc.nextLine();
-            if (line.isEmpty() || line.equals(".")) break;
+            if (line.equals(":wq")) break;
             if (!descriptionBuilder.isEmpty()) descriptionBuilder.append("\n");
             descriptionBuilder.append(line);
         }
