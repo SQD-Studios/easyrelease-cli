@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     implementation(libs.jackson.databind)
-    implementation(libs.jackson.annotations)
 
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
