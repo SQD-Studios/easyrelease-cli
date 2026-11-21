@@ -32,7 +32,7 @@ public class Main {
             }
             release(config);
         } catch (NoSuchElementException elementException) {
-            System.out.println(RESET + PURPLE + "You stopped the input, assuming you were to close the program" + RESET);
+            System.out.println(RESET + PURPLE + "You stopped the input, assuming you were to close the program" + NO_NL);
             System.exit(0);
         }
     }
@@ -120,7 +120,7 @@ public class Main {
             }
         }
 
-        System.out.println(BOLD + "Releasing..." + RESET);
+        System.out.println(BOLD + "Releasing..." + NO_NL);
         for (Platform platform : config.getPlatforms()) {
             if (platform == Platform.modrinth) {
                 new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders)
