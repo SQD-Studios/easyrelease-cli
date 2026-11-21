@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public interface Platform {
     CompletableFuture<Void> release(
             Config config,
-            File file,
+            List<File> files,
             String version,
             String subtitle,
             String description,

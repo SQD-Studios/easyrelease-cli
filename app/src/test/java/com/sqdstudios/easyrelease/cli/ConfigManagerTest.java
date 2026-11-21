@@ -1,12 +1,13 @@
 package com.sqdstudios.easyrelease.cli;
 
 import com.sqdstudios.easyrelease.cli.model.Config;
+import com.sqdstudios.easyrelease.cli.model.Dependency;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +23,7 @@ class ConfigManagerTest {
 
         Config config = new Config();
         config.setModrinthProjectId("test-project");
-        config.setDependencies(Map.of("fabric-api", "required"));
+        config.setDependencies(List.of(new Dependency("fabric-api", "required")));
 
         ConfigManager.saveConfig(config);
 
@@ -31,6 +32,7 @@ class ConfigManagerTest {
         Config loaded = ConfigManager.loadConfig();
         assertEquals("test-project", loaded.getModrinthProjectId());
         assertNotNull(loaded.getDependencies());
-        assertEquals("required", loaded.getDependencies().get("fabric-api"));
+        assertEquals(1, loaded.getDependencies().size());
+        assertEquals("required", loaded.getDependencies().getFirst().getType());
     }
 }

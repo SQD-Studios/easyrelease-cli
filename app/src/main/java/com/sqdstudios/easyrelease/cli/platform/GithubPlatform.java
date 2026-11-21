@@ -29,7 +29,7 @@ public class GithubPlatform implements Platform {
     }
 
     @Override
-    public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
+    public CompletableFuture<Void> release(Config config, List<File> files, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
                 if (config.getGithubRepo() == null) {
@@ -37,6 +37,11 @@ public class GithubPlatform implements Platform {
                     return;
                 } else if (config.getGithubTokenEnv() == null) {
                     error("GitHub Token not configured. Skipping GitHub.");
+                    return;
+                }
+
+                if (files == null || files.isEmpty()) {
+                    error("No files provided for GitHub release. Skipping.");
                     return;
                 }
 
@@ -49,7 +54,7 @@ public class GithubPlatform implements Platform {
                 releaseData.put("name", subtitle);
                 releaseData.put("body", description);
                 releaseData.put("draft", false);
-                releaseData.put("prerelease", channel != Channel.release);
+                releaseData.put("prerelease", channel != Channel.BasicChannel.release);
 
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest createRequest = HttpRequest.newBuilder()
@@ -68,24 +73,26 @@ public class GithubPlatform implements Platform {
                 }
 
                 JsonNode releaseNode = mapper.readTree(createResponse.body());
-                String uploadUrl = releaseNode.get("upload_url").asText().split("\\{")[0];
-                uploadUrl += "?name=" + file.getName();
+                String uploadUrlBase = releaseNode.get("upload_url").asText().split("\\{")[0];
 
-                byte[] fileBytes = Files.readAllBytes(file.toPath());
-                HttpRequest uploadRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(uploadUrl))
-                        .header("Authorization", "Bearer " + config.getGithubTokenEnv())
-                        .header("Content-Type", "application/octet-stream")
-                        .header("User-Agent", "sqdstudios/easyrelease-cli")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(fileBytes))
-                        .build();
+                for (File file : files) {
+                    String uploadUrl = uploadUrlBase + "?name=" + file.getName();
+                    byte[] fileBytes = Files.readAllBytes(file.toPath());
+                    HttpRequest uploadRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(uploadUrl))
+                            .header("Authorization", "Bearer " + config.getGithubTokenEnv())
+                            .header("Content-Type", "application/octet-stream")
+                            .header("User-Agent", "sqdstudios/easyrelease-cli")
+                            .POST(HttpRequest.BodyPublishers.ofByteArray(fileBytes))
+                            .build();
 
-                HttpResponse<String> uploadResponse = client.send(uploadRequest, HttpResponse.BodyHandlers.ofString());
-                if (uploadResponse.statusCode() >= 200 && uploadResponse.statusCode() < 300) {
-                    log("Successfully uploaded to GitHub!");
-                } else {
-                    error("Failed to upload asset to GitHub. Status: " + uploadResponse.statusCode());
-                    error("Response: " + uploadResponse.body());
+                    HttpResponse<String> uploadResponse = client.send(uploadRequest, HttpResponse.BodyHandlers.ofString());
+                    if (uploadResponse.statusCode() >= 200 && uploadResponse.statusCode() < 300) {
+                        log("Successfully uploaded " + file.getName() + " to GitHub!");
+                    } else {
+                        error("Failed to upload asset " + file.getName() + " to GitHub. Status: " + uploadResponse.statusCode());
+                        error("Response: " + uploadResponse.body());
+                    }
                 }
             } catch (Exception e) {
                 error(RED + "Error releasing to github:" + e.getMessage() + RESET);

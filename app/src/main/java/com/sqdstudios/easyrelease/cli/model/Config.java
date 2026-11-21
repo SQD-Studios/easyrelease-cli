@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
-import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Config {
@@ -13,9 +12,12 @@ public class Config {
     private String mainBranch;
     private List<String> minecraftVersions;
     private List<Loader> loaders;
-    private Map<String, String> dependencies; // slug -> dependency_type (required, optional, etc)
+    private List<Dependency> dependencies;
     private String modrinthToken;
     private String githubToken;
+    private String hangarApiKey;
+    private String hangarAuthor;
+    private String hangarSlug;
     private List<Platform> platforms;
 
     public List<Platform> getPlatforms() {
@@ -66,11 +68,11 @@ public class Config {
         this.loaders = loaders;
     }
 
-    public Map<String, String> getDependencies() {
+    public List<Dependency> getDependencies() {
         return dependencies;
     }
 
-    public void setDependencies(Map<String, String> dependencies) {
+    public void setDependencies(List<Dependency> dependencies) {
         this.dependencies = dependencies;
     }
 
@@ -86,6 +88,30 @@ public class Config {
         return githubToken;
     }
 
+    public String getHangarApiKey() {
+        return hangarApiKey;
+    }
+
+    public void setHangarApiKey(String hangarApiKey) {
+        this.hangarApiKey = hangarApiKey;
+    }
+
+    public String getHangarAuthor() {
+        return hangarAuthor;
+    }
+
+    public void setHangarAuthor(String hangarAuthor) {
+        this.hangarAuthor = hangarAuthor;
+    }
+
+    public String getHangarSlug() {
+        return hangarSlug;
+    }
+
+    public void setHangarSlug(String hangarSlug) {
+        this.hangarSlug = hangarSlug;
+    }
+
     @JsonIgnore
     public String getModrinthTokenEnv() {
         if (modrinthToken == null) return System.getenv("MODRINTH_TOKEN");
@@ -96,6 +122,12 @@ public class Config {
     public String getGithubTokenEnv() {
         if (githubToken == null) return System.getenv("GITHUB_TOKEN");
         return githubToken;
+    }
+
+    @JsonIgnore
+    public String getHangarApiKeyEnv() {
+        if (hangarApiKey == null) return System.getenv("HANGAR_API_KEY");
+        return hangarApiKey;
     }
 
     public void setGithubToken(String githubToken) {

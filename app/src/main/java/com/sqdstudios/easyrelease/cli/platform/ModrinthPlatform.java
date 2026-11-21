@@ -3,6 +3,7 @@ package com.sqdstudios.easyrelease.cli.platform;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sqdstudios.easyrelease.cli.model.Channel;
 import com.sqdstudios.easyrelease.cli.model.Config;
+import com.sqdstudios.easyrelease.cli.model.Dependency;
 import com.sqdstudios.easyrelease.cli.model.Loader;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class ModrinthPlatform implements Platform {
     }
 
     @Override
-    public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
+    public CompletableFuture<Void> release(Config config, List<File> files, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
                 if (config.getModrinthProjectId() == null) {
@@ -34,6 +35,11 @@ public class ModrinthPlatform implements Platform {
                     return;
                 } else if (config.getModrinthTokenEnv() == null) {
                     error("Modrinth Token not configured. Skipping Modrinth.");
+                }
+
+                if (files == null || files.isEmpty()) {
+                    error("No files provided for Modrinth release. Skipping.");
+                    return;
                 }
 
                 Map<String, Object> data = new HashMap<>();
@@ -49,25 +55,43 @@ public class ModrinthPlatform implements Platform {
                 data.put("loaders", loaders.stream().map(Loader::getModrinthType).toList());
                 data.put("featured", true);
                 data.put("project_id", config.getModrinthProjectId());
-                data.put("file_parts", List.of("file"));
+
+                List<String> fileParts = new ArrayList<>();
+                for (int i = 0; i < files.size(); i++) {
+                    fileParts.add("file" + i);
+                }
+                data.put("file_parts", fileParts);
+                data.put("primary_file", "file0");
 
                 String boundary = "---" + System.currentTimeMillis();
-                byte[] fileBytes = Files.readAllBytes(file.toPath());
+                
+                StringBuilder multipartHeader = new StringBuilder();
+                multipartHeader.append("--").append(boundary).append("\r\n")
+                        .append("Content-Disposition: form-data; name=\"data\"\r\n\r\n")
+                        .append(mapper.writeValueAsString(data)).append("\r\n");
 
-                String multipartBody = "--" + boundary + "\r\n" +
-                        "Content-Disposition: form-data; name=\"data\"\r\n\r\n" +
-                        mapper.writeValueAsString(data) + "\r\n" +
-                        "--" + boundary + "\r\n" +
-                        "Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n" +
-                        "Content-Type: application/octet-stream\r\n\r\n";
+                List<byte[]> parts = new ArrayList<>();
+                parts.add(multipartHeader.toString().getBytes());
 
-                byte[] start = multipartBody.getBytes();
-                byte[] end = ("\r\n--" + boundary + "--\r\n").getBytes();
+                for (int i = 0; i < files.size(); i++) {
+                    File file = files.get(i);
+                    String filePartHeader = "--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"file" + i + "\"; filename=\"" + file.getName() + "\"\r\n" +
+                            "Content-Type: application/octet-stream\r\n\r\n";
+                    parts.add(filePartHeader.getBytes());
+                    parts.add(Files.readAllBytes(file.toPath()));
+                    parts.add("\r\n".getBytes());
+                }
+                parts.add(("--" + boundary + "--\r\n").getBytes());
 
-                byte[] body = new byte[start.length + fileBytes.length + end.length];
-                System.arraycopy(start, 0, body, 0, start.length);
-                System.arraycopy(fileBytes, 0, body, start.length, fileBytes.length);
-                System.arraycopy(end, 0, body, start.length + fileBytes.length, end.length);
+                int totalLength = 0;
+                for (byte[] part : parts) totalLength += part.length;
+                byte[] body = new byte[totalLength];
+                int currentPos = 0;
+                for (byte[] part : parts) {
+                    System.arraycopy(part, 0, body, currentPos, part.length);
+                    currentPos += part.length;
+                }
 
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
@@ -95,10 +119,10 @@ public class ModrinthPlatform implements Platform {
     private static List<Map<String, Object>> getDependencies(Config config) {
         List<Map<String, Object>> dependencies = new ArrayList<>();
         if (config.getDependencies() != null) {
-            for (Map.Entry<String, String> entry : config.getDependencies().entrySet()) {
+            for (Dependency entry : config.getDependencies()) {
                 Map<String, Object> dep = new HashMap<>();
-                dep.put("project_id", entry.getKey());
-                dep.put("dependency_type", entry.getValue());
+                dep.put("project_id", entry.getName());
+                dep.put("dependency_type", entry.getType());
                 dependencies.add(dep);
             }
         }
