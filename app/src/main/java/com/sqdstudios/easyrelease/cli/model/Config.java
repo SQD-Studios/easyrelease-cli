@@ -1,5 +1,6 @@
 package com.sqdstudios.easyrelease.cli.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
@@ -85,11 +86,13 @@ public class Config {
         return githubToken;
     }
 
+    @JsonIgnore
     public String getModrinthTokenEnv() {
         if (modrinthToken == null) return System.getenv("MODRINTH_TOKEN");
         return modrinthToken;
     }
 
+    @JsonIgnore
     public String getGithubTokenEnv() {
         if (githubToken == null) return System.getenv("GITHUB_TOKEN");
         return githubToken;
