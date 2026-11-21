@@ -5,4 +5,5 @@ module easyrelease.cli.app.main {
     requires jdk.compiler;
 
     exports com.sqdstudios.easyrelease.cli.model;
+    exports com.sqdstudios.easyrelease.cli.platform;
 }

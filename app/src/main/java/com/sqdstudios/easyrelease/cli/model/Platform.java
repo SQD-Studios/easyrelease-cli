@@ -8,9 +8,9 @@ public enum Platform {
     github(GithubPlatform.class),
     ;
 
-    public final Class<?> classz;
+    public final Class<? extends com.sqdstudios.easyrelease.cli.platform.Platform> publishClass;
 
-    Platform(Class<?> classz) {
-        this.classz = classz;
+    Platform(Class<? extends com.sqdstudios.easyrelease.cli.platform.Platform> publishClass) {
+        this.publishClass = publishClass;
     }
 }
