@@ -71,23 +71,27 @@ public class Main {
                 continue;
             }
 
-            System.out.print(CYAN + "Platforms for this file (github, modrinth, hangar) [all]: " + RESET);
-            String platformsInput = sc.nextLine();
             List<Platform> platforms = new ArrayList<>();
-            if (platformsInput.isBlank() || platformsInput.equalsIgnoreCase("all")) {
-                if (config.getPlatforms() != null && !config.getPlatforms().isEmpty()) {
-                    platforms.addAll(config.getPlatforms());
+            if (config.getPlatforms().size() == 1) {
+                String platformNames = Arrays.toString(config.getPlatforms().stream().map(i -> i.name).toArray());
+                System.out.print(CYAN + "Platforms for this file " + platformNames + " [all]: " + RESET);
+                String platformsInput = sc.nextLine();
+                if (platformsInput.isBlank() || platformsInput.equalsIgnoreCase("all")) {
+                    if (config.getPlatforms() != null && !config.getPlatforms().isEmpty()) {
+                        platforms.addAll(config.getPlatforms());
+                    } else {
+                        platforms.addAll(Arrays.asList(Platform.values()));
+                    }
                 } else {
-                    platforms.addAll(Arrays.asList(Platform.values()));
-                }
-            } else {
-                for (String p : platformsInput.split(",")) {
-                    try {
-                        platforms.add(Platform.valueOf(p.trim().toLowerCase()));
-                    } catch (Exception ignored) {
+                    for (String p : platformsInput.split(",")) {
+                        try {
+                            platforms.add(Platform.valueOf(p.trim().toLowerCase()));
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }
+            if (platforms.isEmpty()) platforms.add(config.getPlatforms().getFirst());
             releaseFiles.add(new AbstractMap.SimpleEntry<>(file, platforms));
         }
 

@@ -5,14 +5,16 @@ import com.sqdstudios.easyrelease.cli.platform.HangarPlatform;
 import com.sqdstudios.easyrelease.cli.platform.ModrinthPlatform;
 
 public enum Platform {
-    modrinth(ModrinthPlatform.class),
-    github(GithubPlatform.class),
-    hangar(HangarPlatform.class),
+    modrinth(ModrinthPlatform.class, "modrinth"),
+    github(GithubPlatform.class, "github"),
+    hangar(HangarPlatform.class, "hangar"),
     ;
 
     public final Class<? extends com.sqdstudios.easyrelease.cli.platform.Platform> publishClass;
+    public final String name;
 
-    Platform(Class<? extends com.sqdstudios.easyrelease.cli.platform.Platform> publishClass) {
+    Platform(Class<? extends com.sqdstudios.easyrelease.cli.platform.Platform> publishClass, String name) {
         this.publishClass = publishClass;
+        this.name = name;
     }
 }
