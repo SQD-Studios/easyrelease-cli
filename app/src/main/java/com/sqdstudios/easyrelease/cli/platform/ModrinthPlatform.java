@@ -11,10 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static com.sqdstudios.easyrelease.cli.Main.RED;
@@ -29,7 +26,7 @@ public class ModrinthPlatform implements Platform {
         return CompletableFuture.runAsync(() -> {
             try {
                 if (config.getModrinthProjectId() == null || config.getModrinthToken(false) == null) {
-                    System.err.println("Modrinth Project ID or Token not configured. Skipping Modrinth.");
+                    error("Modrinth Project ID or Token not configured. Skipping Modrinth.");
                     return;
                 }
 
@@ -77,14 +74,14 @@ public class ModrinthPlatform implements Platform {
 
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                    System.out.println("Successfully uploaded to Modrinth!");
+                    log("Successfully uploaded to Modrinth!");
                 } else {
-                    System.err.println("Failed to upload to Modrinth. Status: " + response.statusCode());
-                    System.err.println("Response: " + response.body());
+                    error("Failed to upload to Modrinth. Status: " + response.statusCode());
+                    error("Response: " + response.body());
                 }
             } catch (Exception e) {
-                System.err.println(RED + "Error releasing to modrinth:" + e.getMessage() + RESET);
-                e.printStackTrace();
+                error(RED + "Error releasing to modrinth:" + e.getMessage() + RESET);
+                error(Arrays.toString(e.getStackTrace()));
             }
         });
     }
@@ -100,5 +97,17 @@ public class ModrinthPlatform implements Platform {
             }
         }
         return dependencies;
+    }
+
+    private void log(String message) {
+        synchronized (System.out) {
+            System.out.println(message);
+        }
+    }
+
+    private void error(String message) {
+        synchronized (System.err) {
+            System.err.println(message);
+        }
     }
 }

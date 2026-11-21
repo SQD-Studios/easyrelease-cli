@@ -12,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class GithubPlatform implements Platform {
         return CompletableFuture.runAsync(() -> {
             try {
                 if (config.getGithubRepo() == null || config.getGithubToken(false) == null) {
-                    System.err.println("GitHub Repository or Token not configured. Skipping GitHub.");
+                    error("GitHub Repository or Token not configured. Skipping GitHub.");
                     return;
                 }
 
@@ -54,8 +55,8 @@ public class GithubPlatform implements Platform {
 
                 HttpResponse<String> createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
                 if (createResponse.statusCode() < 200 || createResponse.statusCode() >= 300) {
-                    System.err.println("Failed to create GitHub release. Status: " + createResponse.statusCode());
-                    System.err.println("Response: " + createResponse.body());
+                    error("Failed to create GitHub release. Status: " + createResponse.statusCode());
+                    error("Response: " + createResponse.body());
                     return;
                 }
 
@@ -74,15 +75,27 @@ public class GithubPlatform implements Platform {
 
                 HttpResponse<String> uploadResponse = client.send(uploadRequest, HttpResponse.BodyHandlers.ofString());
                 if (uploadResponse.statusCode() >= 200 && uploadResponse.statusCode() < 300) {
-                    System.out.println("Successfully uploaded to GitHub!");
+                    log("Successfully uploaded to GitHub!");
                 } else {
-                    System.err.println("Failed to upload asset to GitHub. Status: " + uploadResponse.statusCode());
-                    System.err.println("Response: " + uploadResponse.body());
+                    error("Failed to upload asset to GitHub. Status: " + uploadResponse.statusCode());
+                    error("Response: " + uploadResponse.body());
                 }
             } catch (Exception e) {
-                System.err.println(RED + "Error releasing to github:" + e.getMessage() + RESET);
-                e.printStackTrace();
+                error(RED + "Error releasing to github:" + e.getMessage() + RESET);
+                error(Arrays.toString(e.getStackTrace()));
             }
         });
+    }
+
+    private void log(String message) {
+        synchronized (System.out) {
+            System.out.println(message);
+        }
+    }
+
+    private void error(String message) {
+        synchronized (System.err) {
+            System.err.println(message);
+        }
     }
 }

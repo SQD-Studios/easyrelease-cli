@@ -124,7 +124,7 @@ public class Main {
         if (config.getPlatforms().contains(Platform.modrinth)) {
             new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders);
         } else if (config.getPlatforms().contains(Platform.github)) {
-            new GithubPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders);
+            new GithubPlatform().release(config, file, version, subtitle, description, channel, null, null);
         }
     }
 
