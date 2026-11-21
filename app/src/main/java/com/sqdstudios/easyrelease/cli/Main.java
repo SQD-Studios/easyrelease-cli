@@ -12,8 +12,6 @@ import java.util.*;
 
 public class Main {
 
-    private static final Scanner sc = new Scanner(System.in);
-
     public static final String RESET = "\u001B[0m \n";
     public static final String NO_NL = "\u001B[0m";
     public static final String BOLD = "\u001B[1m";
@@ -22,6 +20,7 @@ public class Main {
     public static final String YELLOW = "\u001B[33m";
     public static final String RED = "\u001B[31m";
     public static final String PURPLE = "\u001B[35m";
+    private static final Scanner sc = new Scanner(System.in);
 
     static synchronized void main(String[] args) {
         try {
@@ -68,46 +67,61 @@ public class Main {
             System.exit(-3);
         }
 
-        System.out.print(CYAN + "Platforms to upload to (github, modrinth): " + RESET);
-        String platformsInput = sc.nextLine();
-        List<Platform> selectedPlatforms = new ArrayList<>();
-        for (String p : platformsInput.split(",")) {
-            try {
-                String platformName = p.trim().toLowerCase();
-                selectedPlatforms.add(Platform.valueOf(platformName));
-            } catch (Exception ignored) {
+        if (config.getPlatforms() == null || config.getPlatforms().isEmpty()) {
+            System.out.print(CYAN + "Platforms to upload to (github, modrinth): " + RESET);
+            String platformsInput = sc.nextLine();
+            List<Platform> selectedPlatforms = new ArrayList<>();
+            for (String p : platformsInput.split(",")) {
+                try {
+                    String platformName = p.trim().toLowerCase();
+                    selectedPlatforms.add(Platform.valueOf(platformName));
+                } catch (Exception ignored) {
+                }
             }
+            config.setPlatforms(selectedPlatforms);
         }
 
-        if (selectedPlatforms.isEmpty()) {
+        if (config.getPlatforms().isEmpty()) {
             System.out.println(YELLOW + "No valid platforms selected." + RESET);
             System.exit(-2);
         }
 
-        System.out.print(CYAN + "Channel (release, beta, alpha): " + RESET);
-        Channel channel = getChannel();
-
-        List<String> mcVersions = config.getMinecraftVersions();
-        if (mcVersions == null || mcVersions.isEmpty()) {
-            System.out.print(CYAN + "Minecraft Versions (comma separated): " + RESET);
-            mcVersions = Arrays.asList(sc.nextLine().split(","));
+        Channel channel;
+        if (config.getPlatforms().contains(Platform.modrinth)) {
+            System.out.print(CYAN + "Channel (release, beta, alpha): " + RESET);
+            channel = getChannel();
+        } else {
+            System.out.print(CYAN + "Prerelease (true/false): " + RESET);
+            String prerelease = sc.nextLine();
+            if (Boolean.getBoolean(prerelease)) channel = Channel.beta;
+            else channel = Channel.release;
         }
 
-        List<Loader> loaders = config.getLoaders();
-        if (loaders == null || loaders.isEmpty()) {
-            System.out.print(CYAN + "Loaders (e.g., paper, fabric - comma separated): " + RESET);
-            String[] loaderStrings = sc.nextLine().split(",");
-            loaders = new ArrayList<>();
-            for (String s : loaderStrings) {
-                try {
-                    loaders.add(Loader.valueOf(s.trim().toLowerCase()));
-                } catch (Exception ignored) {
+        List<String> mcVersions = new ArrayList<>();
+        List<Loader> loaders = new ArrayList<>();
+        if (config.getPlatforms().contains(Platform.modrinth)) {
+            mcVersions = config.getMinecraftVersions();
+            if (mcVersions == null || mcVersions.isEmpty()) {
+                System.out.print(CYAN + "Minecraft Versions (comma separated): " + RESET);
+                mcVersions = Arrays.asList(sc.nextLine().split(","));
+            }
+
+            loaders = config.getLoaders();
+            if (loaders == null || loaders.isEmpty()) {
+                System.out.print(CYAN + "Loaders (e.g., paper, fabric - comma separated): " + RESET);
+                String[] loaderStrings = sc.nextLine().split(",");
+                loaders = new ArrayList<>();
+                for (String s : loaderStrings) {
+                    try {
+                        loaders.add(Loader.valueOf(s.trim().toLowerCase()));
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
 
         System.out.println(BOLD + "Releasing..." + RESET);
-        for (Platform platform : selectedPlatforms) {
+        for (Platform platform : config.getPlatforms()) {
             if (platform == Platform.modrinth) {
                 new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders)
                         .whenComplete((_, _) -> {

@@ -80,7 +80,7 @@ public class GithubPlatform implements Platform {
                     System.err.println("Response: " + uploadResponse.body());
                 }
             } catch (Exception e) {
-                System.err.println(RED + "Error releasing to modrinth:" + e.getMessage() + RESET);
+                System.err.println(RED + "Error releasing to github:" + e.getMessage() + RESET);
                 e.printStackTrace();
             }
         });

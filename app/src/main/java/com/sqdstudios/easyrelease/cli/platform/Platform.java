@@ -9,5 +9,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface Platform {
-    CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders);
+    CompletableFuture<Void> release(
+            Config config,
+            File file,
+            String version,
+            String subtitle,
+            String description,
+            Channel channel,
+            List<String> mcVersions,
+            List<Loader> loaders
+    );
 }
