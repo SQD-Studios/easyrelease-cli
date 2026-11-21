@@ -24,6 +24,10 @@ import static com.sqdstudios.easyrelease.cli.Main.RESET;
 public class GithubPlatform implements Platform {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    public GithubPlatform() {
+        log("Starting publishing to Github...");
+    }
+
     @Override
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {

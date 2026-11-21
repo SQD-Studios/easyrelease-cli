@@ -21,6 +21,10 @@ public class ModrinthPlatform implements Platform {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final String API_URL = "https://api.modrinth.com/v2/version";
 
+    public ModrinthPlatform() {
+        log("Starting publishing to Modrinth...");
+    }
+
     @Override
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
