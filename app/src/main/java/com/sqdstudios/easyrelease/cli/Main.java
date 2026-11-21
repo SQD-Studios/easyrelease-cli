@@ -72,7 +72,7 @@ public class Main {
             }
 
             List<Platform> platforms = new ArrayList<>();
-            if (config.getPlatforms().size() == 1) {
+            if (config.getPlatforms().size() > 1) {
                 String platformNames = Arrays.toString(config.getPlatforms().stream().map(i -> i.name).toArray());
                 System.out.print(CYAN + "Platforms for this file " + platformNames + " [all]: " + RESET);
                 String platformsInput = sc.nextLine();
