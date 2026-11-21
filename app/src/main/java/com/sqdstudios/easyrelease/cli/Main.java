@@ -32,7 +32,7 @@ public class Main {
             }
             release(config);
         } catch (NoSuchElementException elementException) {
-            System.out.println(PURPLE + "You stopped the input, assuming you were to close the program" + RESET);
+            System.out.println(RESET + PURPLE + "You stopped the input, assuming you were to close the program" + RESET);
             System.exit(0);
         }
     }
@@ -137,54 +137,69 @@ public class Main {
     public static void config(Config config) {
         System.out.println(PURPLE + BOLD + "--- Configuring EasyRelease CLI ---" + RESET);
 
-        System.out.print(CYAN + "GitHub Repo (owner/repo) [" + NO_NL + YELLOW + config.getGithubRepo() + NO_NL + CYAN + "]: " + RESET);
-        String githubRepo = sc.nextLine();
-        if (!githubRepo.isBlank()) config.setGithubRepo(githubRepo);
-
-        System.out.print(CYAN + "GitHub Token [" + NO_NL + YELLOW + (config.getGithubToken() != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
-        String githubToken = sc.nextLine();
-        if (!githubToken.isBlank()) config.setGithubToken(githubToken);
-
-        System.out.print(CYAN + "GitHub Main Branch [" + NO_NL + YELLOW + config.getMainBranch() + NO_NL + CYAN + "]: " + RESET);
-        String mainBranch = sc.nextLine();
-        if (!mainBranch.isBlank()) config.setMainBranch(mainBranch);
-
-        System.out.print(CYAN + "Modrinth Project ID [" + NO_NL + YELLOW + config.getModrinthProjectId() + NO_NL + CYAN + "]: " + RESET);
-        String modrinthId = sc.nextLine();
-        if (!modrinthId.isBlank()) config.setModrinthProjectId(modrinthId);
-
-        System.out.print(CYAN + "Modrinth Token [" + NO_NL + YELLOW + (config.getModrinthToken() != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
-        String modrinthToken = sc.nextLine();
-        if (!modrinthToken.isBlank()) config.setModrinthToken(modrinthToken);
-
-        System.out.print(CYAN + "Default Minecraft Versions (comma separated) [" + NO_NL + YELLOW + config.getMinecraftVersions() + NO_NL + CYAN + "]: " + RESET);
-        String mcVersions = sc.nextLine();
-        if (!mcVersions.isBlank()) config.setMinecraftVersions(Arrays.asList(mcVersions.split(",")));
-
-        System.out.print(CYAN + "Default Loaders (comma separated) [" + NO_NL + YELLOW + config.getLoaders() + NO_NL + CYAN + "]: " + RESET);
-        String loaderInput = sc.nextLine();
-        if (!loaderInput.isBlank()) {
-            List<Loader> loaders = new ArrayList<>();
-            for (String s : loaderInput.split(",")) {
-                try {
-                    loaders.add(Loader.valueOf(s.trim().toLowerCase()));
-                } catch (Exception ignored) {
-                }
+        System.out.print(CYAN + "Platforms (github, modrinth) [" + NO_NL + YELLOW + config.getPlatforms() + NO_NL + CYAN + "]: " + RESET);
+        String platformsInput = sc.nextLine();
+        List<Platform> selectedPlatforms = new ArrayList<>();
+        for (String p : platformsInput.split(",")) {
+            try {
+                String platformName = p.trim().toLowerCase();
+                selectedPlatforms.add(Platform.valueOf(platformName));
+            } catch (Exception ignored) {
             }
-            config.setLoaders(loaders);
         }
+        config.setPlatforms(selectedPlatforms);
 
-        System.out.print(CYAN + "Dependencies (slug:type, comma separated) [" + NO_NL + YELLOW + config.getDependencies() + NO_NL + CYAN + "]: " + RESET);
-        String depInput = sc.nextLine();
-        if (!depInput.isBlank()) {
-            Map<String, String> deps = new HashMap<>();
-            for (String s : depInput.split(",")) {
-                String[] parts = s.split(":");
-                if (parts.length == 2) {
-                    deps.put(parts[0].trim(), parts[1].trim());
+        if (config.getPlatforms().contains(Platform.github)) {
+            System.out.print(CYAN + "GitHub Repo (owner/repo) [" + NO_NL + YELLOW + config.getGithubRepo() + NO_NL + CYAN + "]: " + RESET);
+            String githubRepo = sc.nextLine();
+            if (!githubRepo.isBlank()) config.setGithubRepo(githubRepo);
+
+            System.out.print(CYAN + "GitHub Token [" + NO_NL + YELLOW + (config.getGithubToken(true) != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
+            String githubToken = sc.nextLine();
+            if (!githubToken.isBlank()) config.setGithubToken(githubToken);
+
+            System.out.print(CYAN + "GitHub Main Branch [" + NO_NL + YELLOW + config.getMainBranch() + NO_NL + CYAN + "]: " + RESET);
+            String mainBranch = sc.nextLine();
+            if (!mainBranch.isBlank()) config.setMainBranch(mainBranch);
+        }
+        if (config.getPlatforms().contains(Platform.modrinth)) {
+            System.out.print(CYAN + "Modrinth Project ID [" + NO_NL + YELLOW + config.getModrinthProjectId() + NO_NL + CYAN + "]: " + RESET);
+            String modrinthId = sc.nextLine();
+            if (!modrinthId.isBlank()) config.setModrinthProjectId(modrinthId);
+
+            System.out.print(CYAN + "Modrinth Token [" + NO_NL + YELLOW + (config.getModrinthToken(true) != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
+            String modrinthToken = sc.nextLine();
+            if (!modrinthToken.isBlank()) config.setModrinthToken(modrinthToken);
+
+            System.out.print(CYAN + "Default Minecraft Versions (comma separated) [" + NO_NL + YELLOW + config.getMinecraftVersions() + NO_NL + CYAN + "]: " + RESET);
+            String mcVersions = sc.nextLine();
+            if (!mcVersions.isBlank()) config.setMinecraftVersions(Arrays.asList(mcVersions.split(",")));
+
+            System.out.print(CYAN + "Default Loaders (comma separated) [" + NO_NL + YELLOW + config.getLoaders() + NO_NL + CYAN + "]: " + RESET);
+            String loaderInput = sc.nextLine();
+            if (!loaderInput.isBlank()) {
+                List<Loader> loaders = new ArrayList<>();
+                for (String s : loaderInput.split(",")) {
+                    try {
+                        loaders.add(Loader.valueOf(s.trim().toLowerCase()));
+                    } catch (Exception ignored) {
+                    }
                 }
+                config.setLoaders(loaders);
             }
-            config.setDependencies(deps);
+
+            System.out.print(CYAN + "Dependencies (slug:type, comma separated) [" + NO_NL + YELLOW + config.getDependencies() + NO_NL + CYAN + "]: " + RESET);
+            String depInput = sc.nextLine();
+            if (!depInput.isBlank()) {
+                Map<String, String> deps = new HashMap<>();
+                for (String s : depInput.split(",")) {
+                    String[] parts = s.split(":");
+                    if (parts.length == 2) {
+                        deps.put(parts[0].trim(), parts[1].trim());
+                    }
+                }
+                config.setDependencies(deps);
+            }
         }
 
         ConfigManager.saveConfig(config);

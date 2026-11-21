@@ -27,7 +27,7 @@ public class GithubPlatform implements Platform {
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
-                if (config.getGithubRepo() == null || config.getGithubToken() == null) {
+                if (config.getGithubRepo() == null || config.getGithubToken(false) == null) {
                     System.err.println("GitHub Repository or Token not configured. Skipping GitHub.");
                     return;
                 }
@@ -46,7 +46,7 @@ public class GithubPlatform implements Platform {
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest createRequest = HttpRequest.newBuilder()
                         .uri(URI.create(createReleaseUrl))
-                        .header("Authorization", "Bearer " + config.getGithubToken())
+                        .header("Authorization", "Bearer " + config.getGithubToken(false))
                         .header("Accept", "application/vnd.github+json")
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(releaseData)))
@@ -66,7 +66,7 @@ public class GithubPlatform implements Platform {
                 byte[] fileBytes = Files.readAllBytes(file.toPath());
                 HttpRequest uploadRequest = HttpRequest.newBuilder()
                         .uri(URI.create(uploadUrl))
-                        .header("Authorization", "Bearer " + config.getGithubToken())
+                        .header("Authorization", "Bearer " + config.getGithubToken(false))
                         .header("Content-Type", "application/octet-stream")
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofByteArray(fileBytes))

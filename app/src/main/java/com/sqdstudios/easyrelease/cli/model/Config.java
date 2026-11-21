@@ -73,8 +73,8 @@ public class Config {
         this.dependencies = dependencies;
     }
 
-    public String getModrinthToken() {
-        if (modrinthToken == null) return System.getenv("MODRINTH_TOKEN");
+    public String getModrinthToken(boolean raw) {
+        if (modrinthToken == null && !raw) return System.getenv("MODRINTH_TOKEN");
         return modrinthToken;
     }
 
@@ -82,8 +82,8 @@ public class Config {
         this.modrinthToken = modrinthToken;
     }
 
-    public String getGithubToken() {
-        if (githubToken == null) return System.getenv("GITHUB_TOKEN");
+    public String getGithubToken(boolean raw) {
+        if (githubToken == null && !raw) return System.getenv("GITHUB_TOKEN");
         return githubToken;
     }
 

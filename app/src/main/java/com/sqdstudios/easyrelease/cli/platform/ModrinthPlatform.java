@@ -28,7 +28,7 @@ public class ModrinthPlatform implements Platform {
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
-                if (config.getModrinthProjectId() == null || config.getModrinthToken() == null) {
+                if (config.getModrinthProjectId() == null || config.getModrinthToken(false) == null) {
                     System.err.println("Modrinth Project ID or Token not configured. Skipping Modrinth.");
                     return;
                 }
@@ -38,15 +38,7 @@ public class ModrinthPlatform implements Platform {
                 data.put("version_number", version);
                 data.put("changelog", description);
 
-                List<Map<String, Object>> dependencies = new ArrayList<>();
-                if (config.getDependencies() != null) {
-                    for (Map.Entry<String, String> entry : config.getDependencies().entrySet()) {
-                        Map<String, Object> dep = new HashMap<>();
-                        dep.put("project_id", entry.getKey());
-                        dep.put("dependency_type", entry.getValue());
-                        dependencies.add(dep);
-                    }
-                }
+                List<Map<String, Object>> dependencies = getDependencies(config);
                 data.put("dependencies", dependencies);
 
                 data.put("game_versions", mcVersions);
@@ -78,7 +70,7 @@ public class ModrinthPlatform implements Platform {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(API_URL))
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                        .header("Authorization", config.getModrinthToken())
+                        .header("Authorization", config.getModrinthToken(false))
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                         .build();
@@ -95,5 +87,18 @@ public class ModrinthPlatform implements Platform {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static List<Map<String, Object>> getDependencies(Config config) {
+        List<Map<String, Object>> dependencies = new ArrayList<>();
+        if (config.getDependencies() != null) {
+            for (Map.Entry<String, String> entry : config.getDependencies().entrySet()) {
+                Map<String, Object> dep = new HashMap<>();
+                dep.put("project_id", entry.getKey());
+                dep.put("dependency_type", entry.getValue());
+                dependencies.add(dep);
+            }
+        }
+        return dependencies;
     }
 }
