@@ -9,6 +9,7 @@ import com.sqdstudios.easyrelease.cli.platform.ModrinthPlatform;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class Main {
 
@@ -93,7 +94,7 @@ public class Main {
         } else {
             System.out.print(CYAN + "Prerelease (true/false): " + RESET);
             String prerelease = sc.nextLine();
-            if (Boolean.getBoolean(prerelease)) channel = Channel.beta;
+            if (Boolean.parseBoolean(prerelease)) channel = Channel.beta;
             else channel = Channel.release;
         }
 
@@ -121,10 +122,16 @@ public class Main {
         }
 
         System.out.println(BOLD + "Releasing..." + NO_NL);
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         if (config.getPlatforms().contains(Platform.modrinth)) {
-            new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders);
-        } else if (config.getPlatforms().contains(Platform.github)) {
-            new GithubPlatform().release(config, file, version, subtitle, description, channel, null, null);
+            futures.add(new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders));
+        }
+        if (config.getPlatforms().contains(Platform.github)) {
+            futures.add(new GithubPlatform().release(config, file, version, subtitle, description, channel, null, null));
+        }
+
+        if (!futures.isEmpty()) {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         }
     }
 
