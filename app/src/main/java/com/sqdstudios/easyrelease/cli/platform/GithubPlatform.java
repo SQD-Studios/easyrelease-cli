@@ -35,7 +35,7 @@ public class GithubPlatform implements Platform {
                 if (config.getGithubRepo() == null) {
                     error("GitHub Repository not configured. Skipping GitHub.");
                     return;
-                } else if (config.getGithubToken(false) == null) {
+                } else if (config.getGithubTokenEnv() == null) {
                     error("GitHub Token not configured. Skipping GitHub.");
                     return;
                 }
@@ -54,7 +54,7 @@ public class GithubPlatform implements Platform {
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest createRequest = HttpRequest.newBuilder()
                         .uri(URI.create(createReleaseUrl))
-                        .header("Authorization", "Bearer " + config.getGithubToken(false))
+                        .header("Authorization", "Bearer " + config.getGithubTokenEnv())
                         .header("Accept", "application/vnd.github+json")
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(releaseData)))
@@ -74,7 +74,7 @@ public class GithubPlatform implements Platform {
                 byte[] fileBytes = Files.readAllBytes(file.toPath());
                 HttpRequest uploadRequest = HttpRequest.newBuilder()
                         .uri(URI.create(uploadUrl))
-                        .header("Authorization", "Bearer " + config.getGithubToken(false))
+                        .header("Authorization", "Bearer " + config.getGithubTokenEnv())
                         .header("Content-Type", "application/octet-stream")
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofByteArray(fileBytes))

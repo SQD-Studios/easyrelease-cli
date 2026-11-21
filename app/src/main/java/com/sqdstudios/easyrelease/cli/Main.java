@@ -155,7 +155,7 @@ public class Main {
             String githubRepo = sc.nextLine();
             if (!githubRepo.isBlank()) config.setGithubRepo(githubRepo);
 
-            System.out.print(CYAN + "GitHub Token [" + NO_NL + YELLOW + (config.getGithubToken(true) != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
+            System.out.print(CYAN + "GitHub Token [" + NO_NL + YELLOW + (config.getGithubToken() != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
             String githubToken = sc.nextLine();
             if (!githubToken.isBlank()) config.setGithubToken(githubToken);
 
@@ -168,7 +168,7 @@ public class Main {
             String modrinthId = sc.nextLine();
             if (!modrinthId.isBlank()) config.setModrinthProjectId(modrinthId);
 
-            System.out.print(CYAN + "Modrinth Token [" + NO_NL + YELLOW + (config.getModrinthToken(true) != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
+            System.out.print(CYAN + "Modrinth Token [" + NO_NL + YELLOW + (config.getModrinthToken() != null ? "****" : "null") + NO_NL + CYAN + "]: " + RESET);
             String modrinthToken = sc.nextLine();
             if (!modrinthToken.isBlank()) config.setModrinthToken(modrinthToken);
 

@@ -32,7 +32,7 @@ public class ModrinthPlatform implements Platform {
                 if (config.getModrinthProjectId() == null) {
                     error("Modrinth Project ID not configured. Skipping Modrinth.");
                     return;
-                } else if (config.getModrinthToken(false) == null) {
+                } else if (config.getModrinthTokenEnv() == null) {
                     error("Modrinth Token not configured. Skipping Modrinth.");
                 }
 
@@ -73,7 +73,7 @@ public class ModrinthPlatform implements Platform {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(API_URL))
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                        .header("Authorization", config.getModrinthToken(false))
+                        .header("Authorization", config.getModrinthTokenEnv())
                         .header("User-Agent", "sqdstudios/easyrelease-cli")
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                         .build();
