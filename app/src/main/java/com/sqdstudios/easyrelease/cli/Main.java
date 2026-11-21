@@ -1,6 +1,5 @@
 package com.sqdstudios.easyrelease.cli;
 
-import com.sqdstudios.easyrelease.cli.model.Platform;
 import com.sqdstudios.easyrelease.cli.model.*;
 import com.sqdstudios.easyrelease.cli.platform.GithubPlatform;
 import com.sqdstudios.easyrelease.cli.platform.HangarPlatform;
@@ -55,9 +54,9 @@ public class Main {
             descriptionBuilder.append(line);
         }
         String description = descriptionBuilder.toString();
-        
+
         List<Map.Entry<File, List<Platform>>> releaseFiles = new ArrayList<>();
-        System.out.println(CYAN + "Files to release - (Write :wq to stop):" + RESET);
+        System.out.println(CYAN + "Files to release - (Write :wq to stop):" + NO_NL);
         while (true) {
             System.out.print(CYAN + "File Path (e.g., build/libs/plugin.jar): " + RESET);
             String filePath = sc.nextLine();
@@ -146,7 +145,7 @@ public class Main {
 
         System.out.println(BOLD + "Releasing..." + NO_NL);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        
+
         Map<Platform, List<File>> filesByPlatform = new HashMap<>();
         for (var entry : releaseFiles) {
             for (Platform p : entry.getValue()) {
