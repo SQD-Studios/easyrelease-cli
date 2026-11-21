@@ -13,7 +13,4 @@ public enum Platform {
     Platform(Class<?> classz) {
         this.classz = classz;
     }
-
-    public void release() {
-    }
 }

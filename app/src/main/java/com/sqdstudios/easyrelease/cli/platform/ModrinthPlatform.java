@@ -43,7 +43,7 @@ public class ModrinthPlatform implements Platform {
 
                 data.put("game_versions", mcVersions);
                 data.put("version_type", channel.toString());
-                data.put("loaders", loaders.stream().map(Enum::toString).toList());
+                data.put("loaders", loaders.stream().map(Loader::getModrinthType).toList());
                 data.put("featured", true);
                 data.put("project_id", config.getModrinthProjectId());
                 data.put("file_parts", List.of("file"));

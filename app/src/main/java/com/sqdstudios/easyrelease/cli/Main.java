@@ -121,16 +121,10 @@ public class Main {
         }
 
         System.out.println(BOLD + "Releasing..." + NO_NL);
-        for (Platform platform : config.getPlatforms()) {
-            if (platform == Platform.modrinth) {
-                new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders)
-                        .whenComplete((_, _) -> {
-                        });
-            } else if (platform == Platform.github) {
-                new GithubPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders)
-                        .whenComplete((_, _) -> {
-                        });
-            }
+        if (config.getPlatforms().contains(Platform.modrinth)) {
+            new ModrinthPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders);
+        } else if (config.getPlatforms().contains(Platform.github)) {
+            new GithubPlatform().release(config, file, version, subtitle, description, channel, mcVersions, loaders);
         }
     }
 
