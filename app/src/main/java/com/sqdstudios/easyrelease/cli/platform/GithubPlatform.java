@@ -32,8 +32,11 @@ public class GithubPlatform implements Platform {
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
-                if (config.getGithubRepo() == null || config.getGithubToken(false) == null) {
-                    error("GitHub Repository or Token not configured. Skipping GitHub.");
+                if (config.getGithubRepo() == null) {
+                    error("GitHub Repository not configured. Skipping GitHub.");
+                    return;
+                } else if (config.getGithubToken(false) == null) {
+                    error("GitHub Token not configured. Skipping GitHub.");
                     return;
                 }
 

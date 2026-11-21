@@ -29,9 +29,11 @@ public class ModrinthPlatform implements Platform {
     public CompletableFuture<Void> release(Config config, File file, String version, String subtitle, String description, Channel channel, List<String> mcVersions, List<Loader> loaders) {
         return CompletableFuture.runAsync(() -> {
             try {
-                if (config.getModrinthProjectId() == null || config.getModrinthToken(false) == null) {
-                    error("Modrinth Project ID or Token not configured. Skipping Modrinth.");
+                if (config.getModrinthProjectId() == null) {
+                    error("Modrinth Project ID not configured. Skipping Modrinth.");
                     return;
+                } else if (config.getModrinthToken(false) == null) {
+                    error("Modrinth Token not configured. Skipping Modrinth.");
                 }
 
                 Map<String, Object> data = new HashMap<>();
