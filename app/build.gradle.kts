@@ -1,7 +1,9 @@
 plugins {
     application
-    id("com.gradleup.shadow") version "9.6.1"
 }
+
+version = "1.0.0"
+group = "com.sqdstudios.easyrelease.cli"
 
 repositories {
     mavenCentral()
@@ -23,16 +25,11 @@ java {
 
 application {
     mainClass = "com.sqdstudios.easyrelease.cli.Main"
+    applicationName = "easyrelease"
 }
 
 tasks {
     test {
         useJUnitPlatform()
-    }
-
-    shadowJar {
-        archiveClassifier.set("easyrelease-cli.jar")
-
-        relocate("com.fasterxml.jackson", "com.sqdstudios.easyrelease.cli.libs")
     }
 }

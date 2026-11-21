@@ -1,13 +1,11 @@
 package com.sqdstudios.easyrelease.cli;
 
 import com.sqdstudios.easyrelease.cli.model.Config;
-import com.sqdstudios.easyrelease.cli.model.Loader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
